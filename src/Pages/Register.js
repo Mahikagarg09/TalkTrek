@@ -3,7 +3,7 @@ import { createUserWithEmailAndPassword,signInWithPopup } from "firebase/auth";
 import { auth,provider} from "../firebase"
 import {useNavigate,Link} from "react-router-dom";
 
-export default function Register() {
+export default function Register({setIsAuth}) {
 
     const[err,setErr]=useState(false);
     const navigate= useNavigate();
@@ -16,7 +16,8 @@ export default function Register() {
 
         try{
             await createUserWithEmailAndPassword(auth, email, password);
-            navigate("/");
+            setIsAuth(true);
+            navigate("/login");
             
         }catch(err){
             setErr(true);
@@ -27,8 +28,18 @@ export default function Register() {
     const handleGoogleSignIn = async () => {
        
         try {
-          await signInWithPopup(auth, provider);
-          navigate("/");
+            const userCredential = await signInWithPopup(auth, provider);
+
+            setIsAuth(true);
+
+            const user = {
+                uid: userCredential.user.uid,
+                email: userCredential.user.email,
+                isAuth: true,
+            };
+            localStorage.setItem('user', JSON.stringify(user));
+            navigate("/chat");
+
         } catch (err) {
           setErr(true);
             

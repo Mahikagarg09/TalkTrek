@@ -1,9 +1,9 @@
-import {React,useState} from "react";
+import { React, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { signInWithEmailAndPassword ,signInWithPopup} from "firebase/auth";
-import { auth ,provider} from "../firebase";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../firebase";
 
-export default function Login() {
+export default function Login({ setIsAuth }) {
 
     const [err, setErr] = useState(false);
     const navigate = useNavigate();
@@ -12,25 +12,46 @@ export default function Login() {
         e.preventDefault();
         const email = e.target[0].value;
         const password = e.target[1].value;
-    
-        try {
-          await signInWithEmailAndPassword(auth, email, password);
-          navigate("/")
-        } catch (err) {
-          setErr(true);
-        }
-      };
 
-      const handleGoogleSignIn = async () => {
-       
         try {
-          await signInWithPopup(auth, provider);
-          navigate("/");
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+            setIsAuth(true);
+
+            const user = {
+                uid: userCredential.user.uid,
+                email: userCredential.user.email,
+                isAuth: true,
+            };
+            localStorage.setItem('user', JSON.stringify(user));
+
+            navigate("/chat");
+
         } catch (err) {
-          setErr(true);
-            
+            setErr(true);
         }
-      };
+    };
+
+    const handleGoogleSignIn = async () => {
+
+        try {
+            const userCredential = await signInWithPopup(auth, provider);
+
+            setIsAuth(true);
+
+            const user = {
+                uid: userCredential.user.uid,
+                email: userCredential.user.email,
+                isAuth: true,
+            };
+            localStorage.setItem('user', JSON.stringify(user));
+            navigate("/chat");
+
+        } catch (err) {
+            setErr(true);
+
+        }
+    };
 
     return (
         <section class="bg-gray-50 dark:bg-gray-900">
@@ -111,7 +132,7 @@ export default function Login() {
                             <p class="text-sm font-light text-gray-500 dark:text-gray-400">
                                 Don’t have an account yet?{" "}
                                 <Link
-                                    to="/register"
+                                    to="/"
                                     class="font-medium text-blue-600 hover:underline dark:text-blue-500"
                                 >
                                     Sign up
