@@ -28,8 +28,8 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Register setIsAuth={setIsAuth} />} />
             <Route path="login" element={<Login setIsAuth={setIsAuth} />} />
-          </Routes>
-        </Router>
+      </Routes>
+    </Router>
       )}
     </>
   )
