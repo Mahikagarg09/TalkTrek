@@ -1,5 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage, ref } from "firebase/storage";
+
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -18,3 +21,8 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
 export const provider = new GoogleAuthProvider();
+
+// Create a root reference
+export const storage = getStorage();
+
+export const db= getFirestore();
