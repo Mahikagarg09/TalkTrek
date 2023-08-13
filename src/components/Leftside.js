@@ -3,10 +3,48 @@ import emptyprofile from '../assets/emptyprofile.jpg'
 import MessageView from './MessageView'
 import { signOut } from 'firebase/auth'
 import { auth } from '../firebase'
-import {AuthContext} from '../Context/AuthContext';
+import { AuthContext } from '../Context/AuthContext';
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../firebase"
+
 
 export default function Leftside() {
-    const {currentUser} = useContext(AuthContext);
+    const { currentUser } = useContext(AuthContext);
+
+    const [searchValue, setsearchValue] = useState("");
+    const [user, setUser] = useState(null);
+    const [err, setErr] = useState(false);
+
+    const handleSearch = async () => {
+        if (searchValue.trim() === "") {
+            setErr(false);
+            setUser(null);
+            return;
+        }
+
+        const q = query(collection(db, "users"), where("name", "==", searchValue));
+
+        try {
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.size === 0) {
+                setErr(true);
+                setUser(null);
+            } else {
+                setErr(false);
+                setUser(querySnapshot.docs[0].data());
+            }
+        } catch (err) {
+            setErr(true);
+            setUser(null);
+            console.log(err);
+        }
+    }
+
+
+    const handleKey = (e) => {
+        e.code == 'Enter' && handleSearch();
+    }
+
     return (
         <>
             <div className="sticky bg-white top-0">
@@ -19,8 +57,8 @@ export default function Leftside() {
                         />
                     </div>
                     <p className="font-semibold text-lg">Messages</p>
-                    <p className=" dark:bg-cyan-900 hover:bg-opacity-50 text-white font-medium px-3 py-2 mr-2 rounded-lg cursor-pointer active:scale-95 transition" 
-                        onClick={() =>signOut(auth)}
+                    <p className=" dark:bg-cyan-900 hover:bg-opacity-50 text-white font-medium px-3 py-2 mr-2 rounded-lg cursor-pointer active:scale-95 transition"
+                        onClick={() => signOut(auth)}
                     >
                         Sign out
                     </p>
@@ -49,10 +87,21 @@ export default function Leftside() {
                     <input
                         className="bg-transparent outline-none  w-full"
                         placeholder="Search"
+                        onChange={e => setsearchValue(e.target.value)}
+                        onKeyDown={handleKey}
                     />
                 </div>
-                <div className="overflow-auto scrollbar-none mt-2">
-                    <MessageView/>
+                {err && <span>User not found</span>}
+                {user &&
+                    <div className='hover:bg-gray-200'>
+                        <div className="overflow-auto scrollbar-none mt-2">
+                            <MessageView user={user} />
+                        </div>
+                        <div className="my-4 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-neutral-300 after:mt-0.5 after:flex-1 after:border-t after:border-neutral-300"></div>
+                    </div>
+                }
+                <div className="overflow-auto scrollbar-none mt-2 hover:bg-gray-200">
+                    <MessageView />
                 </div>
             </div>
         </>
