@@ -1,6 +1,8 @@
 import React from 'react'
 import emptyprofile from '../assets/emptyprofile.jpg'
 import MessageView from './MessageView'
+import { signOut } from 'firebase/auth'
+import { auth } from '../firebase'
 
 export default function Leftside() {
     return (
@@ -15,7 +17,9 @@ export default function Leftside() {
                         />
                     </div>
                     <p className="font-semibold text-lg">Messages</p>
-                    <p className="bg-teal-700 hover:bg-opacity-50 text-white font-medium px-3 py-2 mr-2 rounded-lg cursor-pointer active:scale-95 transition" >
+                    <p className="bg-teal-700 hover:bg-opacity-50 text-white font-medium px-3 py-2 mr-2 rounded-lg cursor-pointer active:scale-95 transition" 
+                        onClick={() =>signOut(auth)}
+                    >
                         Sign out
                     </p>
 
