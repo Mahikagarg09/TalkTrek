@@ -1,18 +1,20 @@
-import React from 'react'
+import React, { useContext, useState } from 'react'
 import emptyprofile from '../assets/emptyprofile.jpg'
 import MessageView from './MessageView'
 import { signOut } from 'firebase/auth'
 import { auth } from '../firebase'
+import {AuthContext} from '../Context/AuthContext';
 
 export default function Leftside() {
+    const {currentUser} = useContext(AuthContext);
     return (
         <>
             <div className="sticky bg-white top-0">
                 <div className="flex items-center justify-between pt-4 ">
                     <div className="flex items-center space-x-2 cursor-pointer">
                         <img
-                            src={emptyprofile}
-                            className="w-12 h-12 rounded-full pointer-events-none object-cover"
+                            src={currentUser.photoURL ? currentUser.photoURL : emptyprofile}
+                            className="w-12 h-12 rounded-full pointer-events-none object-cover ml-2"
                             alt="profile"
                         />
                     </div>
@@ -25,9 +27,8 @@ export default function Leftside() {
 
                 </div>
                 <div>
-                    <p className="mt-4 indent-2 font-semibold">
-                        You logged in as
-                        <span className="text-green hover:underline"> username</span>
+                    <p className="mt-1 indent-2 font-semibold">
+                        {currentUser.displayName}
                     </p>
                 </div>
                 <div className="mt-6 flex space-x-2 border-2 items-center bg-white px-3 py-2 rounded-lg mx-2">

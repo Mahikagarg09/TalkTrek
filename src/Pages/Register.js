@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import {  ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { doc, setDoc } from "firebase/firestore"; 
-import { auth ,db,storage} from "../firebase"
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db, storage } from "../firebase"
 import { useNavigate, Link } from "react-router-dom";
 import uploadimage from "../assets/upload-image.jpg"
 
@@ -10,7 +10,6 @@ export default function Register() {
 
     const [err, setErr] = useState(false);
     const navigate = useNavigate();
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         const name = e.target[0].value;
@@ -19,48 +18,47 @@ export default function Register() {
         const file = e.target[3].files[0];
 
         try {
-            const res=await createUserWithEmailAndPassword(auth, email, password);
+            const res = await createUserWithEmailAndPassword(auth, email, password);
             console.log(res);
 
-            const date=new Date().getTime();
-            const storageRef = ref(storage, `{${name} + ${date}}`);
+            const date = new Date().getTime();
+            let downloadURL = null; // Initialize downloadURL to null
 
-            await uploadBytesResumable(storageRef,file).then(() =>{
-                getDownloadURL(storageRef).then(async(downloadURL) =>{
-                    try{
-                        //----------UPDATEING PROFILE-----
-                        await updateProfile(res.user,{
-                            name,
-                            photoURL:downloadURL
-                        });
-                        console.log("UID:", res.user.uid);
-                        console.log("Name:", name);
-                        console.log("Email:", email);
-                        console.log("PhotoURL:", downloadURL);
+            if (file) {
+                const storageRef = ref(storage, `{${name} + ${date}}`);
+                await uploadBytesResumable(storageRef, file);
+                downloadURL = await getDownloadURL(storageRef);
+            }
 
-                        // Creating Firestore document
-                        await setDoc(doc(db, "users", res.user.uid), {
-                            uid: res.user.uid,
-                            name,
-                            email,
-                            photoURL: downloadURL,
-                        });
-                        
+            try {
+                //----------UPDAING PROFILE-----
+                await updateProfile(res.user, {
+                    displayName: name,
+                    photoURL: downloadURL
+                });
+                
+                // Creating Firestore document
+                await setDoc(doc(db, "users", res.user.uid), {
+                    uid: res.user.uid,
+                    name,
+                    email,
+                    photoURL: downloadURL,
+                });
 
-                        //-------CREATE EMPTY USER CHATS ON FIRESTORE--
-                        await setDoc(doc(db,"userchats",res.user.uid),{});
-                        navigate("/");
-                    }catch (err) {
-                        console.log(err);
-                        setErr(true);
-                    } 
-                })
-            })
-        }catch(err){
+
+                //-------CREATE EMPTY USER CHATS ON FIRESTORE--
+                await setDoc(doc(db, "userchats", res.user.uid), {});
+                navigate("/");
+            } catch (err) {
+                console.log(err);
+                setErr(true);
+            }
+        } catch (err) {
             setErr(true);
-        } 
+        }
 
-    }
+    };
+
     return (
         <section className="bg-gray-50 dark:bg-gray-900">
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -109,7 +107,7 @@ export default function Register() {
                                     id="email"
                                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="name@xyz.com"
-                                    
+
                                 />
                             </div>
                             <div>
@@ -128,15 +126,15 @@ export default function Register() {
                                 />
                             </div>
                             <label
-                                    htmlFor="file"
-                                    className="mb-2 text-sm font-medium text-gray-900 dark:text-white flex "
-                                >
-                                    <img className="w-7 h-7 mr-2" src={uploadimage} alt="Upload Avatar" />
-                                    <span>Add an avatar</span>
-                                </label>
-                            <input required className="flex items-center justify-center w-full text-white focus:ring-4  font-medium rounded-lg text-sm px-5 py-2.5 text-cente bg-teal-500" type="file" id="file" />
+                                htmlFor="file"
+                                className="mb-2 text-sm font-medium text-gray-900 dark:text-white flex "
+                            >
+                                <img className="w-7 h-7 mr-2" src={uploadimage} alt="Upload Avatar" />
+                                <span>Add an avatar</span>
+                            </label>
+                            <input className="flex items-center justify-center w-full text-white focus:ring-4  font-medium rounded-lg text-sm px-5 py-2.5 text-cente bg-teal-500" type="file" id="file" />
                             {/* <button className="flex items-center justify-center w-full text-white focus:ring-4  font-medium rounded-lg text-sm px-5 py-2.5 text-cente bg-teal-500"> */}
-                                {/* <label htmlFor="file" className="flex items-center cursor-pointer">
+                            {/* <label htmlFor="file" className="flex items-center cursor-pointer">
                                     <img className="w-7 h-7 mr-2" src={uploadimage} alt="Upload Avatar" />
                                     <span>Add an avatar</span>
                                 </label> */}
