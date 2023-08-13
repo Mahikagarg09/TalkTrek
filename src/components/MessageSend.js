@@ -44,7 +44,7 @@ export default function MessageSend() {
                         type="button"
                         onClick={() => setOpenPicker(!openPicker)}
                         // disabled={loading}
-                        className="bg-teal-900 text-white px-2 py-2 rounded-md active:scale-95 transition"
+                        className="dark:bg-cyan-900 text-white px-2 py-2 rounded-md active:scale-95 transition"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -63,7 +63,7 @@ export default function MessageSend() {
                 <button
                     type="submit"
                     // disabled={loading}
-                    className="bg-teal-900 text-white px-4 py-2 rounded-md active:scale-95 transition"
+                    className="dark:bg-cyan-900 text-white px-4 py-2 rounded-md active:scale-95 transition"
                 >
                     {/* {loading ? "Sending..." : "Send"} */}Send
                 </button>

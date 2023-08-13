@@ -19,7 +19,7 @@ export default function Leftside() {
                         />
                     </div>
                     <p className="font-semibold text-lg">Messages</p>
-                    <p className="bg-teal-700 hover:bg-opacity-50 text-white font-medium px-3 py-2 mr-2 rounded-lg cursor-pointer active:scale-95 transition" 
+                    <p className=" dark:bg-cyan-900 hover:bg-opacity-50 text-white font-medium px-3 py-2 mr-2 rounded-lg cursor-pointer active:scale-95 transition" 
                         onClick={() =>signOut(auth)}
                     >
                         Sign out

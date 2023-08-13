@@ -62,7 +62,7 @@ export default function Message() {
                         <div className="self-end my-1 flex flex-col items-end">
                             <div
                                 onClick={message.setSelectedMessage}
-                                className={`bg-teal-700 cursor-pointer shadow-md px-4 py-3 rounded-l-2xl ${
+                                className={`bg-sky-900 cursor-pointer shadow-md px-4 py-3 rounded-l-2xl ${
                                     message.isLastMessage ? "rounded-br-2xl " : ""
                                 } ${message.isFirstMessage ? "rounded-tr-2xl " : ""
                                 }  flex items-center justify-center`}

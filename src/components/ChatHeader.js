@@ -3,7 +3,7 @@ import emptyProfile from "../assets/emptyprofile.jpg"
 
 export default function ChatHeader() {
     return (
-        <div className="flex space-x-2 px-2 py-7 shadow-md items-center bg-teal-900 w-full h-10 sticky top-0">
+        <div className="flex space-x-2 px-2 py-7 shadow-md items-center dark:bg-cyan-900 w-full h-10 sticky top-0">
             <div
                 className="cursor-pointer mr-5 md:hidden"
             >
