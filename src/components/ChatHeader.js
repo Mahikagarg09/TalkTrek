@@ -1,7 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import emptyProfile from "../assets/emptyprofile.jpg"
+import { ChatContext } from '../Context/ChatContext';
 
 export default function ChatHeader() {
+    const {data} = useContext(ChatContext);
+    console.log("printing data of chatheaer",data);
     return (
         <div className="flex space-x-2 px-2 py-7 shadow-md items-center dark:bg-cyan-900 w-full h-10 sticky top-0">
             <div
@@ -22,14 +25,13 @@ export default function ChatHeader() {
             </div>
             <div className="flex items-center">
                 <img
-                    src={emptyProfile}
+                    src={data.user?.photoURL || emptyProfile}
                     className="h-10 w-10 rounded-full pointer-events-none object-cover"
                     alt="whatsapp"
                 />
             </div>
             <div>
-                <p className="text-white font-semibold">UserName</p>
-                {/* <p className="text-white text-xs font-medium">{email}</p> */}
+                <p className="text-white font-semibold">{data.user?.displayName}</p>
             </div>
         </div>
     )

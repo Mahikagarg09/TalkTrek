@@ -199,7 +199,7 @@ export default function Leftside() {
                         <div className="my-4 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-neutral-300 after:mt-0.5 after:flex-1 after:border-t after:border-neutral-300"></div>
                     </div>
                 }
-                <div className="overflow-auto scrollbar-none mt-2 hover:bg-gray-200">
+                <div className="overflow-auto scrollbar-none mt-2">
                     <MessageView />
                 </div>
             </div>
