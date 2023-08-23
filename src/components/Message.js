@@ -1,5 +1,8 @@
-import React, { useContext } from 'react';
-import {ChatContext} from "../Context/ChatContext"
+import React, { useContext, useEffect, useState } from 'react';
+import { ChatContext } from "../Context/ChatContext"
+import { onSnapshot, doc } from 'firebase/firestore';
+import { db } from '../firebase';
+import { AuthContext } from '../Context/AuthContext';
 
 function timeConverter(UNIX_timestamp) {
     var a = new Date(UNIX_timestamp.seconds * 1000);
@@ -29,66 +32,46 @@ function timeConverter(UNIX_timestamp) {
         a.getMinutes()
     );
 }
-
-const staticMessages = [
-    {
-        text: 'Hello there!',
-        sender: true,
-        createdAt: { seconds: 1678438400 },
-        selectedMessage: '1',
-        messageId: '1',
-        setSelectedMessage: () => { },
-        isLastMessage: false,
-        isFirstMessage: true,
-    },
-    {
-        text: 'Hi! How are you?',
-        sender: false,
-        createdAt: { seconds: 1678442000 },
-        selectedMessage: '2',
-        messageId: '2',
-        setSelectedMessage: () => { },
-        isLastMessage: false,
-        isFirstMessage: false,
-    },
-    // Add more static message objects here...
-];
-
 export default function Message() {
 
-    const {user} = useContext(ChatContext);
+    const { data } = useContext(ChatContext);
+    const [messages, setMessages] = useState([]);
+    const { currentUser } = useContext(AuthContext);
+
+    useEffect(() => {
+        const unSub = onSnapshot(doc(db, "chats", data.chatId), (doc) => {
+            doc.exists() && setMessages(doc.data().messages);
+        })
+
+        return () => {
+            unSub();
+        }
+    }, [data.chatId])
+
 
     return (
         <div>
-            {staticMessages.map((message) => (
-                <div key={message.messageId}>
-                    {message.sender ? (
+            {messages.map((m) => (
+                <div key={m.id}>
+                    {m.senderId === currentUser.uid ? (
                         <div className="self-end my-1 flex flex-col items-end">
                             <div
-                                onClick={message.setSelectedMessage}
-                                className={`bg-sky-900 cursor-pointer shadow-md px-4 py-3 rounded-l-2xl ${message.isLastMessage ? "rounded-br-2xl " : ""
-                                    } ${message.isFirstMessage ? "rounded-tr-2xl " : ""
-                                    }  flex items-center justify-center`}
+                                // onClick={message.setSelectedMessage}
+                                className="bg-sky-900 cursor-pointer shadow-md px-4 py-3 rounded-l-2xl flex items-center justify-center"
                             >
-                                <p className="text-white text-xl">{message.text}</p>
+                                <p className="text-white text-xl">{m.text}</p>
                             </div>
-                            {message.selectedMessage === message.messageId && (
-                                <p className="text-xs font-medium mt-1 text-white">{timeConverter(message.createdAt)}</p>
-                            )}
+                            <p className="text-xs font-medium mt-1 text-white">{timeConverter(m.date)}</p>
                         </div>
                     ) : (
                         <div className="self-start my-1 flex flex-col items-start">
                             <div
-                                onClick={message.setSelectedMessage}
-                                className={`bg-white cursor-pointer  ${message.isLastMessage ? "rounded-bl-2xl " : ""
-                                    } ${message.isFirstMessage ? "rounded-tl-2xl " : ""
-                                    }  shadow-md px-4 py-3 rounded-r-2xl  flex items-center justify-center`}
+                                // onClick={message.setSelectedMessage}
+                                className="bg-white cursor-pointer  shadow-md px-4 py-3 rounded-r-2xl  flex items-center justify-center"
                             >
-                                <p className='text-xl'>{message.text}</p>
+                                <p className='text-xl'>{m.text}</p>
                             </div>
-                            {message.selectedMessage === message.messageId && (
-                                <p className="text-xs font-medium mt-1 text-white">{timeConverter(message.createdAt)}</p>
-                            )}
+                                <p className="text-xs font-medium mt-1 text-white">{timeConverter(m.date)}</p>
                         </div>
                     )}
                 </div>
