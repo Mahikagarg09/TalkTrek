@@ -4,7 +4,6 @@ import { ChatContext } from '../Context/ChatContext';
 
 export default function ChatHeader() {
     const {data} = useContext(ChatContext);
-    console.log("printing data of chatheaer",data);
     return (
         <div className="flex space-x-2 px-2 py-7 shadow-md items-center dark:bg-cyan-900 w-full h-10 sticky top-0">
             <div
