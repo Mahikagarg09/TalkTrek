@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ChatContext } from "../Context/ChatContext"
 import { onSnapshot, doc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -48,7 +48,6 @@ export default function Message() {
         }
     }, [data.chatId])
 
-
     return (
         <div>
             {messages.map((m) => (
@@ -56,7 +55,6 @@ export default function Message() {
                     {m.senderId === currentUser.uid ? (
                         <div className="self-end my-1 flex flex-col items-end">
                             <div
-                                // onClick={message.setSelectedMessage}
                                 className="bg-sky-900 cursor-pointer shadow-md px-4 py-3 rounded-l-2xl flex items-center justify-center"
                             >
                                 <p className="text-white text-xl">{m.text}</p>
@@ -66,7 +64,6 @@ export default function Message() {
                     ) : (
                         <div className="self-start my-1 flex flex-col items-start">
                             <div
-                                // onClick={message.setSelectedMessage}
                                 className="bg-white cursor-pointer  shadow-md px-4 py-3 rounded-r-2xl  flex items-center justify-center"
                             >
                                 <p className='text-xl'>{m.text}</p>
