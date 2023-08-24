@@ -48,27 +48,52 @@ export default function Message() {
         }
     }, [data.chatId])
 
+    console.log(messages);
+
     return (
-        <div>
+        <div className='mt-[80px]'>
             {messages.map((m) => (
                 <div key={m.id}>
                     {m.senderId === currentUser.uid ? (
                         <div className="self-end my-1 flex flex-col items-end">
-                            <div
-                                className="bg-sky-900 cursor-pointer shadow-md px-4 py-3 rounded-l-2xl flex items-center justify-center"
-                            >
-                                <p className="text-white text-xl">{m.text}</p>
+                            <div className="bg-sky-900 cursor-pointer shadow-md px-4 py-3 rounded-l-2xl flex items-center justify-center">
+                                <div className="flex flex-col justify-center items-center rounded-md w-fit my-1 ">
+                                    <p className="text-white text-xl whitespace-normal">{m.text}</p>
+                                    {m.img && (
+                                        <div className="relative w-100 p-2">
+                                            <img
+                                                src={m.img}
+                                                alt="img_message"
+                                                className="rounded-md max-w-[270px] w-100"
+                                            />
+                                        </div>
+                                    )}
+                                    <p className="mt-1 text-[#8796a1] text-[10px] min-w-[50px] right-2">{timeConverter(m.date)}</p>
+                                </div>
                             </div>
-                            <p className="text-xs font-medium mt-1 text-white">{timeConverter(m.date)}</p>
+
                         </div>
+
+
                     ) : (
                         <div className="self-start my-1 flex flex-col items-start">
                             <div
                                 className="bg-white cursor-pointer  shadow-md px-4 py-3 rounded-r-2xl  flex items-center justify-center"
                             >
-                                <p className='text-xl'>{m.text}</p>
+                                <div className="flex flex-col items-center justify-center">
+                                    <p className="text-white text-xl whitespace-normal">{m.text}</p>
+                                    {m.img && (
+                                        <div className="relative w-100 p-2">
+                                            <img
+                                                src={m.img}
+                                                alt="img_message"
+                                                className="rounded-md max-w-[270px] w-100"
+                                            />
+                                        </div>
+                                    )}
+                                    <p className="mt-1 text-[#8796a1] text-[10px] min-w-[50px] right-2">{timeConverter(m.date)}</p>
+                                </div>
                             </div>
-                                <p className="text-xs font-medium mt-1 text-white">{timeConverter(m.date)}</p>
                         </div>
                     )}
                 </div>

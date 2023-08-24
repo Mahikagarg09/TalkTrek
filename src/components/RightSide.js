@@ -14,7 +14,7 @@ const RightSide = () => {
             }}
         >
             <ChatHeader />
-            <div className="flex flex-col overflow-auto scrollbar-none px-5 py-4 ">
+            <div className="flex flex-col px-5 py-4 ">
                 <Message />
                 <div className="py-4" ref={dummyRef} />
             </div>
