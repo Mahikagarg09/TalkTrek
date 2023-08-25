@@ -15,6 +15,9 @@ export default function Leftside() {
     const [searchValue, setsearchValue] = useState("");
     const [user, setUser] = useState(null);
     const [err, setErr] = useState(false);
+    const [showPopover, setShowPopover] = useState(false);
+    const [dname, setDname] = useState(currentUser.displayName);
+
 
     const handleSearch = async () => {
         if (searchValue.trim() === "") {
@@ -60,8 +63,6 @@ export default function Leftside() {
         try {
             //if the chat between the user is exist 
             //we store in the response constant
-
-
             const res = await getDoc(doc(db, "chats", combinedId));
             console.log(res)
             /*If the Response that is chat between the user is not exsit we create the Chats  */
@@ -144,17 +145,121 @@ export default function Leftside() {
         //create user chats
     };
 
+    // -----------------------------PROFILE CLICK-----------------------------------
+    const handleProfileClick = () => {
+        console.log("I am clicked")
+        setShowPopover(!showPopover);
+        console.log(showPopover)
+    };
+
+    const handleChangePhoto = async () => {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.addEventListener('change', async (event) => {
+            const selectedFile = event.target.files[0];
+            if (selectedFile) {
+                // Logic to upload and update the display photo
+                // Update the user's photoURL in Firestore or your storage
+            }
+            setShowPopover(false); // Close the popover after action
+        });
+        fileInput.click();
+    };
+
+    const handleChangeName = () => {
+        const newName = prompt('Enter the new display name');
+        if (newName) {
+            // Logic to update the display name
+            // Update the user's name in Firestore or your database
+        }
+        setShowPopover(false); // Close the popover after action
+    };
+
     return (
         <>
             <div className="sticky bg-white top-0">
                 <div className="flex items-center justify-between pt-4 ">
                     <div className="flex items-center space-x-2 cursor-pointer">
-                        <img
-                            src={currentUser.photoURL ? currentUser.photoURL : emptyprofile}
-                            className="w-12 h-12 rounded-full pointer-events-none object-cover ml-2"
-                            alt="profile"
-                        />
+                        <button onClick={handleProfileClick} data-modal-target="defaultModal" data-modal-toggle="defaultModal" type="button">
+                            <img
+                                src={currentUser.photoURL ? currentUser.photoURL : emptyprofile}
+                                className="w-12 h-12 rounded-full pointer-events-none object-cover ml-2"
+                                alt="profile"
+
+                            />
+                        </button>
                     </div>
+                    {showPopover ? (
+                        <>
+                            <div
+                                className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed z-50 outline-none focus:outline-none top-4 left-4"
+                            >
+                                <div className="relative w-auto my-6 mx-auto max-w-sm">
+                                    {/*content*/}
+                                    <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full outline-none bg-white focus:outline-none">
+                                        {/*header*/}
+                                        <div className="flex items-start justify-between p-5 border-b border-solid  text-white  bg-cyan-900 border-slate-200 rounded-t">
+                                            <h3 className="text-3xl font-semibold">
+                                                Settings
+                                            </h3>
+                                            <button
+                                                className="p-1 ml-auto bg-transparent border-0 text-white opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+                                                onClick={() => setShowPopover(false)}
+                                            >
+                                                <span className="bg-transparent text-white opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
+                                                    ×
+                                                </span>
+                                            </button>
+                                        </div>
+                                        {/*body*/}
+                                        <div className="relative p-6 flex-auto">
+                                            <span className='font-bold  px-2 py-2 text-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150'>Change Profile Photo</span>
+                                            <div className="sm:flex text-center sm:justify-between mb-2 p-5 pt-2">
+                                                <div className="flex justify-center">
+                                                    <img src={currentUser.photoURL ? currentUser.photoURL : emptyprofile} alt="Avatar" className="bg-cover w-28 h-28 rounded-full" />
+                                                </div>
+                                                <div className="sm:mt-[40px] mt-5">
+                                                    <label className="items-center text-base font-medium rounded-xl bg-violet-50 px-4 cursor-pointer ml-5">
+                                                        Upload Photo
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            // onChange={handleImageChange}
+                                                            // ref={fileInputRef}
+                                                            className="hidden"
+                                                        />
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <span className='font-bold  px-2 py-2 text-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150'>Change Display Name</span>
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-semibold ml-2 mt-4 ">{currentUser.displayName}</span>
+                                                    <div
+                                                        className="inline-flex items-center text-base font-medium rounded-xl bg-violet-50 px-4 cursor-pointer mt-2"
+                                                        // onClick={handleEditClick}
+                                                    >
+                                                        Edit
+                                                    </div>
+                                            </div>
+                                        </div>
+                                        {/*footer*/}
+                                        <div className="flex items-center justify-end p-6  rounded-b">
+                                            <button
+                                                className="bg-cyan-900 text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                                                type="button"
+                                                onClick={() => setShowPopover(false)}
+                                            >
+                                                Close
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+                        </>
+                    ) : null}
+
                     <p className="font-semibold text-lg">Messages</p>
                     <p className=" dark:bg-cyan-900 hover:bg-opacity-50 text-white font-medium px-3 py-2 mr-2 rounded-lg cursor-pointer active:scale-95 transition"
                         onClick={() => signOut(auth)}
@@ -202,7 +307,7 @@ export default function Leftside() {
                 <div className="overflow-auto scrollbar-none mt-2">
                     <MessageView />
                 </div>
-            </div>
+            </div >
         </>
     )
 }
