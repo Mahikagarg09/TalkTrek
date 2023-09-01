@@ -16,7 +16,6 @@ export default function Leftside() {
     const [user, setUser] = useState(null);
     const [err, setErr] = useState(false);
     const [showPopover, setShowPopover] = useState(false);
-    const [dname, setDname] = useState(currentUser.displayName);
 
 
     const handleSearch = async () => {
@@ -147,33 +146,7 @@ export default function Leftside() {
 
     // -----------------------------PROFILE CLICK-----------------------------------
     const handleProfileClick = () => {
-        console.log("I am clicked")
         setShowPopover(!showPopover);
-        console.log(showPopover)
-    };
-
-    const handleChangePhoto = async () => {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'image/*';
-        fileInput.addEventListener('change', async (event) => {
-            const selectedFile = event.target.files[0];
-            if (selectedFile) {
-                // Logic to upload and update the display photo
-                // Update the user's photoURL in Firestore or your storage
-            }
-            setShowPopover(false); // Close the popover after action
-        });
-        fileInput.click();
-    };
-
-    const handleChangeName = () => {
-        const newName = prompt('Enter the new display name');
-        if (newName) {
-            // Logic to update the display name
-            // Update the user's name in Firestore or your database
-        }
-        setShowPopover(false); // Close the popover after action
     };
 
     return (
@@ -183,7 +156,7 @@ export default function Leftside() {
                     <div className="flex items-center space-x-2 cursor-pointer">
                         <button onClick={handleProfileClick} data-modal-target="defaultModal" data-modal-toggle="defaultModal" type="button">
                             <img
-                                src={currentUser.photoURL ? currentUser.photoURL : emptyprofile}
+                                src={currentUser.photoURL || emptyprofile}
                                 className="w-12 h-12 rounded-full pointer-events-none object-cover ml-2"
                                 alt="profile"
 
@@ -217,7 +190,7 @@ export default function Leftside() {
                                             <span className='font-bold  px-2 py-2 text-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150'>Change Profile Photo</span>
                                             <div className="sm:flex text-center sm:justify-between mb-2 p-5 pt-2">
                                                 <div className="flex justify-center">
-                                                    <img src={currentUser.photoURL ? currentUser.photoURL : emptyprofile} alt="Avatar" className="bg-cover w-28 h-28 rounded-full" />
+                                                    <img src={currentUser.photoURL || emptyprofile} alt="Avatar" className="bg-cover w-28 h-28 rounded-full" />
                                                 </div>
                                                 <div className="sm:mt-[40px] mt-5">
                                                     <label className="items-center text-base font-medium rounded-xl bg-violet-50 px-4 cursor-pointer ml-5">
