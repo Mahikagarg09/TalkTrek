@@ -48,7 +48,6 @@ export default function Message() {
         }
     }, [data.chatId])
 
-    console.log(messages);
 
     return (
         <div className='mt-[80px]'>

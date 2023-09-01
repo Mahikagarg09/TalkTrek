@@ -18,8 +18,15 @@ export const AuthContextProvider = ({ children }) => {
     }
   }, []);
 
+  const value = {
+    currentUser,
+    setCurrentUser, // Make sure this is defined in your context
+    // Other authentication-related functions...
+  };
+
+
   return (
-    <AuthContext.Provider value={{ currentUser }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

@@ -21,15 +21,21 @@ export const ChatContextProvider = ({ children }) => {
                         ? currentUser.uid + action.payload.uid
                         : action.payload.uid + currentUser.uid,
                 }
+            case "UPDATE_USER_INFO":
+                // Update the user's information in the chat context state
+                return {
+                    ...state,
+                    user: action.payload,
+                };
             default:
                 return state
         }
     }
 
-    const[state, dispatch] = useReducer(chatReducer,INITIAL_STATE)
+    const [state, dispatch] = useReducer(chatReducer, INITIAL_STATE)
 
     return (
-        <ChatContext.Provider value={{data:state,dispatch }}>
+        <ChatContext.Provider value={{ data: state, dispatch }}>
             {children}
         </ChatContext.Provider>
     );

@@ -2,15 +2,24 @@ import React, { useContext, useState } from 'react'
 import emptyprofile from '../assets/emptyprofile.jpg'
 import MessageView from './MessageView'
 import SearchUser from './SearchUser'
-import { signOut } from 'firebase/auth'
+import { signOut, updateProfile } from 'firebase/auth'
 import { auth } from '../firebase'
 import { AuthContext } from '../Context/AuthContext';
 import { collection, query, where, getDocs, getDoc, setDoc, updateDoc, serverTimestamp, doc } from "firebase/firestore";
-import { db } from "../firebase"
+import { db, storage } from "../firebase"
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ChatContext } from '../Context/ChatContext'
 
 
 export default function Leftside() {
-    const { currentUser } = useContext(AuthContext);
+    // const { currentUser } = useContext(AuthContext);
+    const { currentUser, setCurrentUser } = useContext(AuthContext);
+    const { dispatch } = useContext(ChatContext);
+    const {data} = useContext(ChatContext);
+    const [newDisplayName, setNewDisplayName] = useState(currentUser.displayName || "");
+    const [newProfilePhoto, setNewProfilePhoto] = useState(null);
+    const [editDisplayName, setEditDisplayName] = useState(false);
+    const [editProfilePhoto, setEditProfilePhoto] = useState(false);
 
     const [searchValue, setsearchValue] = useState("");
     const [user, setUser] = useState(null);
@@ -63,12 +72,8 @@ export default function Leftside() {
             //if the chat between the user is exist 
             //we store in the response constant
             const res = await getDoc(doc(db, "chats", combinedId));
-            console.log(res)
             /*If the Response that is chat between the user is not exsit we create the Chats  */
             if (!res.exists()) {
-
-                //creating chat in chats collection 
-                console.log(res)
 
                 await setDoc(doc(db, "chats", combinedId), { messages: [] });
                 //create user Chats
@@ -149,6 +154,51 @@ export default function Leftside() {
         setShowPopover(!showPopover);
     };
 
+    const handleEditDisplayName = () => {
+        setNewDisplayName(currentUser.displayName || "");
+    };
+
+    const handleSaveDisplayName = async () => {
+        try {
+            await updateProfile(currentUser, { displayName: newDisplayName });
+            setCurrentUser({ ...currentUser, displayName: newDisplayName });
+            await updateDoc(doc(db, "users", currentUser.uid), {
+                name: newDisplayName,
+                lastUpdated: serverTimestamp(),
+            });
+            setNewDisplayName("");
+            console.log(currentUser);
+        } catch (error) {
+            console.error("Error updating display name:", error);
+        }
+    };
+
+    const handleEditProfilePhoto = () => {
+        document.getElementById("profilePhotoInput").click();
+    };
+
+    const handleProfilePhotoChange = (e) => {
+        const file = e.target.files[0];
+        setNewProfilePhoto(file);
+    };
+
+    const handleSaveProfilePhoto = async () => {
+        if (!newProfilePhoto) return;
+        const date = new Date().getTime();
+        try {
+            const storageRef = ref(storage, `{${currentUser.displayName} + ${date}}`);
+            await uploadBytesResumable(storageRef, newProfilePhoto);
+            const downloadURL = await getDownloadURL(storageRef);
+
+            await updateProfile(currentUser, { photoURL: downloadURL });
+            setCurrentUser({ ...currentUser, photoURL: downloadURL });
+            setNewProfilePhoto(null);
+        } catch (error) {
+            console.error("Error uploading profile photo:", error);
+        }
+    };
+
+
     return (
         <>
             <div className="sticky bg-white top-0">
@@ -192,28 +242,52 @@ export default function Leftside() {
                                                 <div className="flex justify-center">
                                                     <img src={currentUser.photoURL || emptyprofile} alt="Avatar" className="bg-cover w-28 h-28 rounded-full" />
                                                 </div>
-                                                <div className="sm:mt-[40px] mt-5">
-                                                    <label className="items-center text-base font-medium rounded-xl bg-violet-50 px-4 cursor-pointer ml-5">
-                                                        Upload Photo
+                                                {editProfilePhoto ? (
+                                                    <div className="upload-profile-photo">
                                                         <input
                                                             type="file"
                                                             accept="image/*"
-                                                            // onChange={handleImageChange}
-                                                            // ref={fileInputRef}
-                                                            className="hidden"
+                                                            onChange={handleProfilePhotoChange}
+                                                            style={{ display: "none" }}
                                                         />
-                                                    </label>
-                                                </div>
+                                                        <button onClick={handleSaveProfilePhoto}>Save Photo</button>
+                                                        <button onClick={() => setEditProfilePhoto(false)}>Cancel</button>
+                                                    </div>
+                                                ) : (
+                                                    <div
+                                                        className="inline-flex items-center text-base font-medium rounded-xl bg-violet-50 px-4 cursor-pointer mt-2"
+                                                        onClick={() => setEditProfilePhoto(true)}
+                                                    >
+                                                        Upload Photo
+                                                    </div>
+                                                )}
                                             </div>
                                             <span className='font-bold  px-2 py-2 text-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150'>Change Display Name</span>
                                             <div className="flex items-center justify-between">
-                                                <span className="font-semibold ml-2 mt-4 ">{currentUser.displayName}</span>
+                                                <span className="font-semibold ml-2 mt-4 ">
+                                                    {editDisplayName ? (
+                                                        <input
+                                                            type="text"
+                                                            value={newDisplayName}
+                                                            onChange={(e) => setNewDisplayName(e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        currentUser.displayName
+                                                    )}
+                                                </span>
+                                                {editDisplayName ? (
+                                                    <>
+                                                        <button className="inline-flex items-center text-base font-medium rounded-xl bg-violet-50 px-4 cursor-pointer mt-2" onClick={handleSaveDisplayName}>Save</button>
+                                                        <button className='inline-flex items-center text-base font-medium rounded-xl bg-violet-50 px-4 cursor-pointer mt-2' onClick={() => setEditDisplayName(false)}>Cancel</button>
+                                                    </>
+                                                ) : (
                                                     <div
                                                         className="inline-flex items-center text-base font-medium rounded-xl bg-violet-50 px-4 cursor-pointer mt-2"
-                                                        // onClick={handleEditClick}
+                                                        onClick={() => setEditDisplayName(true)}
                                                     >
                                                         Edit
                                                     </div>
+                                                )}
                                             </div>
                                         </div>
                                         {/*footer*/}
