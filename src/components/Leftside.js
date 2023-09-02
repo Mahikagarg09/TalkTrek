@@ -15,7 +15,7 @@ export default function Leftside() {
     // const { currentUser } = useContext(AuthContext);
     const { currentUser, setCurrentUser } = useContext(AuthContext);
     const { dispatch } = useContext(ChatContext);
-    const {data} = useContext(ChatContext);
+    const { data } = useContext(ChatContext);
     const [newDisplayName, setNewDisplayName] = useState(currentUser.displayName || "");
     const [newProfilePhoto, setNewProfilePhoto] = useState(null);
     const [editDisplayName, setEditDisplayName] = useState(false);
@@ -160,12 +160,35 @@ export default function Leftside() {
 
     const handleSaveDisplayName = async () => {
         try {
+
+            const q = query(collection(db, "userchats"));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach(async (doc) => {
+                const userData = doc.data();
+                // Iterate through the nested objects
+                for (const key in userData) {
+                    if (userData.hasOwnProperty(key)) {
+                        const nestedData = userData[key];
+                        // Check if the nested object contains userInfo and displayName
+                        if (nestedData.userInfo && nestedData.userInfo.displayName==currentUser.displayName) {
+                            // Update the displayName
+                            nestedData.userInfo.displayName = newDisplayName;
+                            // Update the document in Firebase with the modified data
+                            await setDoc(doc.ref, userData);
+                            console.log("Display name updated successfully!");
+                        }
+                    }
+                }
+            });
+
             await updateProfile(currentUser, { displayName: newDisplayName });
             setCurrentUser({ ...currentUser, displayName: newDisplayName });
+
             await updateDoc(doc(db, "users", currentUser.uid), {
                 name: newDisplayName,
                 lastUpdated: serverTimestamp(),
             });
+            
             setNewDisplayName("");
             console.log(currentUser);
         } catch (error) {
@@ -197,7 +220,6 @@ export default function Leftside() {
             console.error("Error uploading profile photo:", error);
         }
     };
-
 
     return (
         <>

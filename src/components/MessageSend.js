@@ -36,26 +36,6 @@ export default function MessageSend() {
 
     const handleSend = async () => {
         if (img) {
-            console.log(img);
-             // const storageRef = ref(storage, uuid());
-            // const uploadTask = uploadBytesResumable(storageRef, img);
-
-            // uploadTask.on(
-            //     (error) => {
-
-            //     },
-            //     () => {
-            //         getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-            //             messages: arrayUnion({
-            //                 id: uuid(),
-            //                 text,
-            //                 senderId: currentUser.uid,
-            //                 date: Timestamp.now(),
-            //                 img: downloadURL
-            //             })
-            //         })
-            //     }
-            // )
             const storageRef = ref(storage, uuid());
             const uploadTask = uploadBytesResumable(storageRef, img);
 
