@@ -8,24 +8,18 @@ import { AuthContext } from '../Context/AuthContext';
 import { collection, query, where, getDocs, getDoc, setDoc, updateDoc, serverTimestamp, doc } from "firebase/firestore";
 import { db, storage } from "../firebase"
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { ChatContext } from '../Context/ChatContext'
 
 
 export default function Leftside() {
-    // const { currentUser } = useContext(AuthContext);
     const { currentUser, setCurrentUser } = useContext(AuthContext);
-    const { dispatch } = useContext(ChatContext);
-    const { data } = useContext(ChatContext);
     const [newDisplayName, setNewDisplayName] = useState(currentUser.displayName || "");
-    const [newProfilePhoto, setNewProfilePhoto] = useState(null);
     const [editDisplayName, setEditDisplayName] = useState(false);
-    const [editProfilePhoto, setEditProfilePhoto] = useState(false);
-
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [uploading, setUploading] = useState(false);
     const [searchValue, setsearchValue] = useState("");
     const [user, setUser] = useState(null);
     const [err, setErr] = useState(false);
     const [showPopover, setShowPopover] = useState(false);
-
 
     const handleSearch = async () => {
         if (searchValue.trim() === "") {
@@ -33,9 +27,7 @@ export default function Leftside() {
             setUser(null);
             return;
         }
-
         const q = query(collection(db, "users"), where("name", "==", searchValue));
-
         try {
             const querySnapshot = await getDocs(q);
             if (querySnapshot.size === 0) {
@@ -52,7 +44,6 @@ export default function Leftside() {
         }
     }
 
-
     const handleKey = (e) => {
         e.code == 'Enter' && handleSearch();
     }
@@ -65,9 +56,6 @@ export default function Leftside() {
             currentUser.uid > user.uid
                 ? currentUser.uid + user.uid
                 : user.uid + currentUser.uid;
-
-
-
         try {
             //if the chat between the user is exist 
             //we store in the response constant
@@ -114,7 +102,6 @@ export default function Leftside() {
     
                        we are updating it when we Send msg to friend
                     */
-
                 });
 
                 /* We are doing same thing for the other side of  user  */
@@ -137,25 +124,17 @@ export default function Leftside() {
                     */
 
                 });
-
-
             }
         }
         catch (err) { }
 
         setUser(null);
         setsearchValue("");
-
-        //create user chats
     };
 
     // -----------------------------PROFILE CLICK-----------------------------------
     const handleProfileClick = () => {
         setShowPopover(!showPopover);
-    };
-
-    const handleEditDisplayName = () => {
-        setNewDisplayName(currentUser.displayName || "");
     };
 
     const handleSaveDisplayName = async () => {
@@ -170,7 +149,7 @@ export default function Leftside() {
                     if (userData.hasOwnProperty(key)) {
                         const nestedData = userData[key];
                         // Check if the nested object contains userInfo and displayName
-                        if (nestedData.userInfo && nestedData.userInfo.displayName==currentUser.displayName) {
+                        if (nestedData.userInfo && nestedData.userInfo.displayName == currentUser.displayName) {
                             // Update the displayName
                             nestedData.userInfo.displayName = newDisplayName;
                             // Update the document in Firebase with the modified data
@@ -188,7 +167,7 @@ export default function Leftside() {
                 name: newDisplayName,
                 lastUpdated: serverTimestamp(),
             });
-            
+
             setNewDisplayName("");
             console.log(currentUser);
         } catch (error) {
@@ -196,31 +175,57 @@ export default function Leftside() {
         }
     };
 
-    const handleEditProfilePhoto = () => {
-        document.getElementById("profilePhotoInput").click();
-    };
-
-    const handleProfilePhotoChange = (e) => {
-        const file = e.target.files[0];
-        setNewProfilePhoto(file);
-    };
-
-    const handleSaveProfilePhoto = async () => {
-        if (!newProfilePhoto) return;
-        const date = new Date().getTime();
+    const uploadImage = async () => {
         try {
-            const storageRef = ref(storage, `{${currentUser.displayName} + ${date}}`);
-            await uploadBytesResumable(storageRef, newProfilePhoto);
-            const downloadURL = await getDownloadURL(storageRef);
+            if (selectedImage) {
+                console.log("selected img",selectedImage)
+                setUploading(true);
+                // Upload the selected image to a storage location (e.g., Firebase Storage).
+                const storageRef = ref(storage, `user-profiles/${currentUser.uid}`);
+                await  uploadBytesResumable(storageRef, selectedImage);
 
-            await updateProfile(currentUser, { photoURL: downloadURL });
-            setCurrentUser({ ...currentUser, photoURL: downloadURL });
-            setNewProfilePhoto(null);
+                // Get the download URL of the uploaded image.
+                const downloadURL = await getDownloadURL(storageRef);
+
+                const q = query(collection(db, "userchats"));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach(async (doc) => {
+                    const userData = doc.data();
+                    // Iterate through the nested objects
+                    for (const key in userData) {
+                        if (userData.hasOwnProperty(key)) {
+                            const nestedData = userData[key];
+                            // Check if the nested object contains userInfo and displayName
+                            if (nestedData.userInfo.displayName == currentUser.displayName && (nestedData.userInfo.photoURL==null || nestedData.userInfo.photoURL == currentUser.photoURL)) {
+                                // Update
+                                nestedData.userInfo.photoURL = downloadURL;
+                                // Update the document in Firebase with the modified data
+                                await setDoc(doc.ref, userData);
+                                console.log("Profile pic  updated successfully!");
+                            }
+                        }
+                    }
+                });
+                // Update the user's profile picture in Firebase Authentication.
+                await updateProfile(currentUser, { photoURL: downloadURL });
+                setCurrentUser({ ...currentUser, photoURL: downloadURL });
+
+                // Update the user's profile picture in Firestore (if needed).
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    photoURL: downloadURL,
+                    lastUpdated: serverTimestamp(),
+                });
+                setUploading(false);
+
+                // Clear the selected image state and update UI.
+                setSelectedImage(null);
+                console.log("Profile picture updated successfully!");
+            }
         } catch (error) {
-            console.error("Error uploading profile photo:", error);
+            console.error("Error uploading profile picture:", error);
+            setUploading(false);
         }
     };
-
     return (
         <>
             <div className="sticky bg-white top-0">
@@ -262,27 +267,36 @@ export default function Leftside() {
                                             <span className='font-bold  px-2 py-2 text-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150'>Change Profile Photo</span>
                                             <div className="sm:flex text-center sm:justify-between mb-2 p-5 pt-2">
                                                 <div className="flex justify-center">
-                                                    <img src={currentUser.photoURL || emptyprofile} alt="Avatar" className="bg-cover w-28 h-28 rounded-full" />
+                                                    {selectedImage || currentUser.photoURL || emptyprofile ? (
+                                                        <img src={selectedImage || currentUser.photoURL || emptyprofile} alt="Avatar" className="bg-cover w-28 h-28 rounded-full" />
+                                                    ) : (
+                                                        <img src={currentUser.photoURL || emptyprofile} alt="Avatar" className="w-28 bg-cover" />
+                                                    )}
                                                 </div>
-                                                {editProfilePhoto ? (
-                                                    <div className="upload-profile-photo">
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            onChange={handleProfilePhotoChange}
-                                                            style={{ display: "none" }}
-                                                        />
-                                                        <button onClick={handleSaveProfilePhoto}>Save Photo</button>
-                                                        <button onClick={() => setEditProfilePhoto(false)}>Cancel</button>
-                                                    </div>
-                                                ) : (
-                                                    <div
-                                                        className="inline-flex items-center text-base font-medium rounded-xl bg-violet-50 px-4 cursor-pointer mt-2"
-                                                        onClick={() => setEditProfilePhoto(true)}
-                                                    >
-                                                        Upload Photo
-                                                    </div>
-                                                )}
+                                                <div className="sm:mt-[40px] mt-5">
+                                                    {uploading ? (
+                                                        <button className="items-center text-base font-medium rounded-xl bg-violet-50 px-4 mx-2" disabled>
+                                                            Uploading...
+                                                        </button>
+                                                    ) : selectedImage ? (
+                                                        <button className="items-center text-base font-medium rounded-xl bg-violet-50 px-4 "
+                                                            onClick={uploadImage}
+                                                        >
+                                                            Upload
+                                                        </button>
+                                                    ) : (
+                                                        <label className="items-center text-base font-medium rounded-xl bg-violet-50 px-4 cursor-pointer">
+                                                            Upload Photo
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                onChange={(e) => setSelectedImage(e.target.files[0])}
+                                                                // ref={fileInputRef}
+                                                                className="hidden"
+                                                            />
+                                                        </label>
+                                                    )}
+                                                </div>
                                             </div>
                                             <span className='font-bold  px-2 py-2 text-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150'>Change Display Name</span>
                                             <div className="flex items-center justify-between">
