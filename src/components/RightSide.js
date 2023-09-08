@@ -2,9 +2,10 @@ import React, { memo, useContext, useRef } from 'react';
 import ChatHeader from './ChatHeader';
 import MessageSend from './MessageSend';
 import Message from './Message';
+import chatimage from '../assets/chatimage.png'
 import { ChatContext } from '../Context/ChatContext';
 
-const RightSide = ({toggleSidebar}) => {
+const RightSide = ({ toggleSidebar }) => {
     const { data } = useContext(ChatContext);
     const dummyRef = useRef(null);
     return (
@@ -27,9 +28,14 @@ const RightSide = ({toggleSidebar}) => {
                     </div>
                 </>
             ):
-            <div className='text-3xl font-bold my-auto mx-auto'>
-                Choose a person to chat!
-            </div>
+            <div className="flex flex-col justify-center items-center h-full my-auto">
+                    <img src={chatimage} alt="Chat" className="w-100 h-80 mb-4" />
+                    <div className='text-3xl font-bold bg-cyan-900 rounded-xl p-4 text-white cursor-pointer'
+                    onClick={toggleSidebar}
+                    >
+                        Choose a person to chat!
+                    </div>
+                </div>
             }
         </div>
     );
