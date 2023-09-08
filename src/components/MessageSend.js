@@ -35,8 +35,10 @@ export default function MessageSend() {
     }
 
     const handleSend = async () => {
+        const date = new Date().getTime();
         if (img) {
-            const storageRef = ref(storage, uuid());
+            // const storageRef = ref(storage, uuid());
+            const storageRef = ref(storage, `${uuid()}/{${currentUser.uid} + ${date}}`)
             const uploadTask = uploadBytesResumable(storageRef, img);
 
             try {
