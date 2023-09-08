@@ -92,6 +92,7 @@ export default function Leftside({toggleSidebar}) {
                         uid: user.uid,
                         displayName: user.name,
                         photoURL: user.photoURL,
+                        lowercase:user.name.toLowerCase(),
 
                     },
 
@@ -111,7 +112,8 @@ export default function Leftside({toggleSidebar}) {
 
                         uid: currentUser.uid,
                         displayName: currentUser.displayName,
-                        photoURL: currentUser.photoURL
+                        photoURL: currentUser.photoURL,
+                        lowercase:currentUser.displayName.toLowerCase(),
 
                     },
 
@@ -166,6 +168,7 @@ export default function Leftside({toggleSidebar}) {
             await updateDoc(doc(db, "users", currentUser.uid), {
                 name: newDisplayName,
                 lastUpdated: serverTimestamp(),
+                name_in_lowercase:newDisplayName.toLowerCase()
             });
 
             setNewDisplayName("");

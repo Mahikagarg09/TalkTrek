@@ -8,6 +8,7 @@ import uploadimage from "../assets/upload-image.jpg"
 
 export default function Register() {
 
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     const [err, setErr] = useState(false);
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
@@ -16,6 +17,13 @@ export default function Register() {
         const email = e.target[1].value;
         const password = e.target[2].value;
         const file = e.target[3].files[0];
+
+        if (!regex.test(password)) {
+            setErr("Password must contain at least one uppercase letter, one lowercase letter, one digit, one special character, and be at least 8 characters long.");
+            return;
+        };
+
+        const lowercaseName = name.toLowerCase();
 
         try {
             const res = await createUserWithEmailAndPassword(auth, email, password);
@@ -36,13 +44,14 @@ export default function Register() {
                     displayName: name,
                     photoURL: downloadURL
                 });
-                
+
                 // Creating Firestore document
                 await setDoc(doc(db, "users", res.user.uid), {
                     uid: res.user.uid,
                     name,
                     email,
                     photoURL: downloadURL,
+                    name_in_lowercase:lowercaseName,
                 });
 
 
@@ -51,16 +60,16 @@ export default function Register() {
                 navigate("/");
             } catch (err) {
                 console.log(err);
-                setErr(true);
+                setErr("An error occured while registering");
             }
         } catch (err) {
-            setErr(true);
+            setErr("An error occured while registering");
         }
 
     };
 
     return (
-        <section className="bg-gray-50 dark:bg-gray-900">
+        <section className="bg-gray-50 dark:bg-gray-900 min-h-screen">
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                 <Link
                     to="/register"
@@ -73,7 +82,7 @@ export default function Register() {
                     />
                     TalkTrek
                 </Link>
-                <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+                <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700 mt-7">
                     <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                         <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                             Create an account
@@ -133,20 +142,13 @@ export default function Register() {
                                 <span>Add an avatar</span>
                             </label>
                             <input className="flex items-center justify-center w-full text-white focus:ring-4  font-medium rounded-lg text-sm px-5 py-2.5 text-cente bg-teal-500" type="file" id="file" />
-                            {/* <button className="flex items-center justify-center w-full text-white focus:ring-4  font-medium rounded-lg text-sm px-5 py-2.5 text-cente bg-teal-500"> */}
-                            {/* <label htmlFor="file" className="flex items-center cursor-pointer">
-                                    <img className="w-7 h-7 mr-2" src={uploadimage} alt="Upload Avatar" />
-                                    <span>Add an avatar</span>
-                                </label> */}
-                            {/* </button> */}
-
                             <button
                                 type="submit"
                                 className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                             >
                                 Create an account
                             </button>
-                            {err && <span>Something went wrong</span>}
+                            {err && <span className="text-red-700 font-medium">{err}</span>}
                             {/* <!-- Divider --> */}
                             <div
                                 className="my-4 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-neutral-300 after:mt-0.5 after:flex-1 after:border-t after:border-neutral-300">

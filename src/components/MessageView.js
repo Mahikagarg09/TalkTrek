@@ -49,7 +49,7 @@ export default function MessageView({toggleSidebar}) {
 
     return (
         <>
-            {Object.entries(chats)?.sort((a, b) => b[1].date - a[1].date).map((chat) => (
+            {chats && Object.entries(chats)?.sort((a, b) => b[1].date - a[1].date).map((chat) => (
                 <div key={chat[0]} >
                     <div
                         className="h-14 w-full mt-2 flex items-center justify-between rounded-md px-2 py-1 cursor-pointer transition duration-200 hover:bg-gray-200 hover:bg-opacity-60"
