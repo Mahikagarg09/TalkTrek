@@ -23,7 +23,7 @@ function timeConverter(UNIX_timestamp) {
     }
 }
 
-export default function MessageView() {
+export default function MessageView({toggleSidebar}) {
     const { currentUser } = useContext(AuthContext);
     const { dispatch } = useContext(ChatContext);
 
@@ -44,6 +44,7 @@ export default function MessageView() {
 
     const handleSelect = (u) => {
         dispatch({ type: "CHANGE_USER", payload: u })
+        toggleSidebar()
     }
 
     return (

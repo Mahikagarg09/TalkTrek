@@ -10,7 +10,7 @@ import { db, storage } from "../firebase"
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 
-export default function Leftside() {
+export default function Leftside({toggleSidebar}) {
     const { currentUser, setCurrentUser } = useContext(AuthContext);
     const [newDisplayName, setNewDisplayName] = useState(currentUser.displayName || "");
     const [editDisplayName, setEditDisplayName] = useState(false);
@@ -388,7 +388,7 @@ export default function Leftside() {
                     </div>
                 }
                 <div className="overflow-auto scrollbar-none mt-2">
-                    <MessageView />
+                    <MessageView  toggleSidebar={toggleSidebar}/>
                 </div>
             </div >
         </>

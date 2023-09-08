@@ -4,7 +4,7 @@ import MessageSend from './MessageSend';
 import Message from './Message';
 import { ChatContext } from '../Context/ChatContext';
 
-const RightSide = () => {
+const RightSide = ({toggleSidebar}) => {
     const { data } = useContext(ChatContext);
     const dummyRef = useRef(null);
     return (
@@ -17,7 +17,7 @@ const RightSide = () => {
         >
             {data.chatId != "null" ? (
                 <>
-                    <ChatHeader />
+                    <ChatHeader toggleSidebar={toggleSidebar} />
                     <div className="flex flex-col px-5 py-4 ">
                         <Message />
                         <div className="py-4" ref={dummyRef} />
