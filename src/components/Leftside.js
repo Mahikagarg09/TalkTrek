@@ -10,7 +10,7 @@ import { db, storage } from "../firebase"
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 
-export default function Leftside({toggleSidebar}) {
+export default function Leftside({ toggleSidebar }) {
     const { currentUser, setCurrentUser } = useContext(AuthContext);
     const [newDisplayName, setNewDisplayName] = useState(currentUser.displayName || "");
     const [editDisplayName, setEditDisplayName] = useState(false);
@@ -21,21 +21,55 @@ export default function Leftside({toggleSidebar}) {
     const [err, setErr] = useState(false);
     const [showPopover, setShowPopover] = useState(false);
 
-    const handleSearch = async () => {
-        if (searchValue.trim() === "") {
+    const handleSearch = async (e) => {
+        const trimmedSearchValue = e.target.value.trim().toLowerCase();
+        setsearchValue(trimmedSearchValue);
+
+        if (trimmedSearchValue === "") {
             setErr(false);
             setUser(null);
             return;
         }
-        const q = query(collection(db, "users"), where("name", "==", searchValue));
+
+        const currentUserId = currentUser.uid; // Assuming you have currentUser defined
+
+        // Query to filter by 'name_in_lowercase' field
+        const nameQuery = query(
+            collection(db, "users"),
+            where("name_in_lowercase", ">=", trimmedSearchValue),
+            where("name_in_lowercase", "<=", trimmedSearchValue + "\uf8ff")
+        );
+
+        // Query to exclude current user by 'uid'
+        const excludeCurrentUserQuery = query(
+            collection(db, "users"),
+            where("uid", "!=", currentUserId)
+        );
+
         try {
-            const querySnapshot = await getDocs(q);
-            if (querySnapshot.size === 0) {
+            // Execute both queries concurrently using Promise.all
+            const [nameQuerySnapshot, excludeCurrentUserQuerySnapshot] = await Promise.all([
+                getDocs(nameQuery),
+                getDocs(excludeCurrentUserQuery)
+            ]);
+
+            // Filter users by 'name_in_lowercase' query
+            const matchingUsersByName = nameQuerySnapshot.docs.map((doc) => doc.data());
+
+            // Filter users to exclude the current user
+            const matchingUsersExcludingCurrentUser = excludeCurrentUserQuerySnapshot.docs.map((doc) => doc.data());
+
+            // Find the intersection of the two result sets
+            const matchingUsers = matchingUsersByName.filter(user =>
+                matchingUsersExcludingCurrentUser.some(excludedUser => excludedUser.uid === user.uid)
+            );
+
+            if (matchingUsers.length === 0) {
                 setErr(true);
                 setUser(null);
             } else {
                 setErr(false);
-                setUser(querySnapshot.docs[0].data());
+                setUser(matchingUsers);
             }
         } catch (err) {
             setErr(true);
@@ -43,11 +77,6 @@ export default function Leftside({toggleSidebar}) {
             console.log(err);
         }
     }
-
-    const handleKey = (e) => {
-        e.code == 'Enter' && handleSearch();
-    }
-
     //--------------------------------IF ANY USER IS SELECTED TO CHAT----------------
 
     const handleSelect = async () => {
@@ -92,7 +121,7 @@ export default function Leftside({toggleSidebar}) {
                         uid: user.uid,
                         displayName: user.name,
                         photoURL: user.photoURL,
-                        lowercase:user.name.toLowerCase(),
+                        lowercase: user.name.toLowerCase(),
 
                     },
 
@@ -113,7 +142,7 @@ export default function Leftside({toggleSidebar}) {
                         uid: currentUser.uid,
                         displayName: currentUser.displayName,
                         photoURL: currentUser.photoURL,
-                        lowercase:currentUser.displayName.toLowerCase(),
+                        lowercase: currentUser.displayName.toLowerCase(),
 
                     },
 
@@ -168,7 +197,7 @@ export default function Leftside({toggleSidebar}) {
             await updateDoc(doc(db, "users", currentUser.uid), {
                 name: newDisplayName,
                 lastUpdated: serverTimestamp(),
-                name_in_lowercase:newDisplayName.toLowerCase()
+                name_in_lowercase: newDisplayName.toLowerCase()
             });
 
             setNewDisplayName("");
@@ -181,11 +210,11 @@ export default function Leftside({toggleSidebar}) {
     const uploadImage = async () => {
         try {
             if (selectedImage) {
-                console.log("selected img",selectedImage)
+                console.log("selected img", selectedImage)
                 setUploading(true);
                 // Upload the selected image to a storage location (e.g., Firebase Storage).
                 const storageRef = ref(storage, `user-profiles/${currentUser.uid}`);
-                await  uploadBytesResumable(storageRef, selectedImage);
+                await uploadBytesResumable(storageRef, selectedImage);
 
                 // Get the download URL of the uploaded image.
                 const downloadURL = await getDownloadURL(storageRef);
@@ -199,7 +228,7 @@ export default function Leftside({toggleSidebar}) {
                         if (userData.hasOwnProperty(key)) {
                             const nestedData = userData[key];
                             // Check if the nested object contains userInfo and displayName
-                            if (nestedData.userInfo.displayName == currentUser.displayName && (nestedData.userInfo.photoURL==null || nestedData.userInfo.photoURL == currentUser.photoURL)) {
+                            if (nestedData.userInfo.displayName == currentUser.displayName && (nestedData.userInfo.photoURL == null || nestedData.userInfo.photoURL == currentUser.photoURL)) {
                                 // Update
                                 nestedData.userInfo.photoURL = downloadURL;
                                 // Update the document in Firebase with the modified data
@@ -294,7 +323,6 @@ export default function Leftside({toggleSidebar}) {
                                                                 type="file"
                                                                 accept="image/*"
                                                                 onChange={(e) => setSelectedImage(e.target.files[0])}
-                                                                // ref={fileInputRef}
                                                                 className="hidden"
                                                             />
                                                         </label>
@@ -375,10 +403,10 @@ export default function Leftside({toggleSidebar}) {
                         />
                     </svg>
                     <input
-                        className="bg-transparent outline-none  w-full"
+                        className="bg-transparent outline-none w-full"
                         placeholder="Search"
-                        onChange={e => setsearchValue(e.target.value)}
-                        onKeyDown={handleKey}
+                        onChange={handleSearch}
+                        value={searchValue}
                     />
                 </div>
                 {err && <span>User not found</span>}
@@ -391,7 +419,7 @@ export default function Leftside({toggleSidebar}) {
                     </div>
                 }
                 <div className="overflow-auto scrollbar-none mt-2">
-                    <MessageView  toggleSidebar={toggleSidebar}/>
+                    <MessageView toggleSidebar={toggleSidebar} />
                 </div>
             </div >
         </>
