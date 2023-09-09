@@ -5,7 +5,7 @@ import { db } from '../firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { AuthContext } from '../Context/AuthContext';
 
-export default function ChatHeader({ toggleSidebar }) {
+export default function ChatHeader({ toggleSidebar,sidebarVisible }) {
     const { data } = useContext(ChatContext);
     const {currentUser} = useContext(AuthContext);
 
@@ -28,7 +28,7 @@ export default function ChatHeader({ toggleSidebar }) {
     }
 
     return (
-        <div className="flex sm:items-center justify-between py-2  bg-cyan-900 sticky">
+        <div className={`flex sm:items-center justify-between py-2 bg-cyan-900 fixed right-0 top-0 ${sidebarVisible ? 'left-[400px]' : 'left-0'}`}>
             <div className="relative flex items-center space-x-4">
                 <div  onClick={toggleSidebar}>
                     <svg style={{ "color": "white" }} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className=" bi bi-arrow-left cursor-pointer w-10 object-cover md:hidden" viewBox="0 0 16 16">

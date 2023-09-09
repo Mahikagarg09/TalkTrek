@@ -10,6 +10,7 @@ import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 export default function MessageSend() {
     const [text, setText] = useState("");
     const [img, setImg] = useState(null);
+    const [imgPreview, setImgPreview] = useState(null);
     const [openPicker, setOpenPicker] = useState(false);
     const pickerRef = useRef(null);
     const { currentUser } = useContext(AuthContext);
@@ -34,7 +35,18 @@ export default function MessageSend() {
         setText((prevtext) => prevtext + event.emoji);
     }
 
+    const handleImageChange = (e) => {
+        const selectedImage = e.target.files[0];
+        setImg(selectedImage);
+        // Create a URL for the selected image and set it as the preview
+        setImgPreview(URL.createObjectURL(selectedImage));
+    };
+
+
     const handleSend = async () => {
+        if (!text && !img) {
+            return; // Do nothing if both are empty
+        }
         const date = new Date().getTime();
         if (img) {
             // const storageRef = ref(storage, uuid());
@@ -91,24 +103,41 @@ export default function MessageSend() {
         })
         setImg(null);
         setText("");
+        setImgPreview(null);
     }
 
     return (
         <div
             className="px-4 shadow-md py-2 w-full bg-gray-50 flex border-2 border-green rounded-xl"
         >
-            <input type="file" style={{ display: "none" }} id="file" onChange={e => setImg(e.target.files[0])} />
+            <input
+                type="file"
+                style={{ display: "none" }}
+                id="file"
+                onChange={handleImageChange} // Update to use handleImageChange
+            />
             <label htmlFor='file' className='cursor-pointer'>
-                <svg width="44px"
-                    height="44px"
-                    viewBox="-2.4 -2.4 28.80 28.80"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    transform="rotate(45)" stroke="#181b1a">
-                    <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-                    <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
-                    <g id="SVGRepo_iconCarrier"> <path fillRule="evenodd" clipRule="evenodd" d="M7 15C7 16.5738 7.74097 18.0557 9 19C9.86548 19.6491 10.9181 20 12 20C13.0819 20 14.1345 19.6491 15 19C16.259 18.0557 17 16.5738 17 15L17 6C17 5.44771 17.4477 5 18 5C18.5523 5 19 5.44771 19 6L19 15C19 17.2033 17.9626 19.278 16.2 20.6C14.9883 21.5088 13.5146 22 12 22C10.4854 22 9.01167 21.5088 7.8 20.6C6.03736 19.278 5 17.2033 5 15L5 7C5 4.23858 7.23858 2 10 2C12.7614 2 15 4.23858 15 7L15 15.1716C15 15.9672 14.6839 16.7303 14.1213 17.2929C12.9497 18.4645 11.0503 18.4645 9.87868 17.2929C9.31607 16.7303 9 15.9672 9 15.1716L9 7C9 6.44771 9.44771 6 10 6C10.5523 6 11 6.44771 11 7L11 15.1716C11 15.4368 11.1054 15.6911 11.2929 15.8787C11.6834 16.2692 12.3166 16.2692 12.7071 15.8787C12.8946 15.6911 13 15.4368 13 15.1716L13 7C13 5.34315 11.6569 4 10 4C8.34315 4 7 5.34315 7 7L7 15Z" fill="#0d3a40"></path> </g>
-                </svg>
+                {imgPreview ? (
+                    <img
+                        src={imgPreview}
+                        alt="Selected Image"
+                        className="h-8 w-8 rounded-full object-cover"
+                    />
+                ) : (
+                    <svg
+                        width="44px"
+                        height="44px"
+                        viewBox="-2.4 -2.4 28.80 28.80"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        transform="rotate(45)"
+                        stroke="#181b1a"
+                    >
+                        <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                        <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+                        <g id="SVGRepo_iconCarrier"> <path fillRule="evenodd" clipRule="evenodd" d="M7 15C7 16.5738 7.74097 18.0557 9 19C9.86548 19.6491 10.9181 20 12 20C13.0819 20 14.1345 19.6491 15 19C16.259 18.0557 17 16.5738 17 15L17 6C17 5.44771 17.4477 5 18 5C18.5523 5 19 5.44771 19 6L19 15C19 17.2033 17.9626 19.278 16.2 20.6C14.9883 21.5088 13.5146 22 12 22C10.4854 22 9.01167 21.5088 7.8 20.6C6.03736 19.278 5 17.2033 5 15L5 7C5 4.23858 7.23858 2 10 2C12.7614 2 15 4.23858 15 7L15 15.1716C15 15.9672 14.6839 16.7303 14.1213 17.2929C12.9497 18.4645 11.0503 18.4645 9.87868 17.2929C9.31607 16.7303 9 15.9672 9 15.1716L9 7C9 6.44771 9.44771 6 10 6C10.5523 6 11 6.44771 11 7L11 15.1716C11 15.4368 11.1054 15.6911 11.2929 15.8787C11.6834 16.2692 12.3166 16.2692 12.7071 15.8787C12.8946 15.6911 13 15.4368 13 15.1716L13 7C13 5.34315 11.6569 4 10 4C8.34315 4 7 5.34315 7 7L7 15Z" fill="#0d3a40"></path> </g>
+                    </svg>
+                )}
             </label>
             <input
                 className="outline-none w-full px-4 py-2 bg-transparent font-medium"
