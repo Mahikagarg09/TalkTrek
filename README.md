@@ -1,70 +1,93 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# TalkTrek
 
-## Available Scripts
+This project aims to create a dynamic chat website.
 
-In the project directory, you can run:
+## Technologies Used
+- FrontEnd : React JS , Tailwind CSS , Vercel(deployment)
+- Backend  : Firebase
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- User Authentication
+- Editable User Profile- display name and display photo
+- Search a friend to chat with
+- Chat with a person
+- Delete chat messages 
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## FrontEnd Development
 
-### `npm test`
+### Register and Login Process
+The application provides a secure way of user authentication.
+User can create account with his basic detail or  signin using google/email.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Chat Page
+The left side of the page provides features such as-
+-Clicking display photo provides option to change display name and display photo.
+-Search a friend to chat with who as an account on TalkTrek
+-Select a friend to chat with using text, images and emojis.
+-Delete chat with a person.
 
-### `npm run build`
+## Backend Development
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Firebase Integration
+Firebase is used for data storage and retrieval . User profiles and chats  are stored and managed within the Firebase database and storage.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Deployment
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The project is deployed using:
+- Frontend: Vercel
+- Backend: Firebase
 
-### `npm run eject`
+#### Project Deployed Link: [Live Site](https://talk-trek-ten.vercel.app/)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Routes Used
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **Signup Page:** `/register`
+- **Login Page:** `/login`
+- **Chat Page:** `/`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## How to Setup
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Clone this repository
+```bash
+  git clone https://github.com/Mahikagarg09/TalkTrek
 
-## Learn More
+```
+Navigate to the project directory
+```bash
+cd TalkTrek
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Install dependencies
+```bash
+npm install
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Configure environment variables for Firebase
+```bash
+REACT_APP_FIREBASE_API_KEY
+REACT_APP_FIREBASE_AUTH_DOMAIN
+REACT_APP_FIREBASE_PROJECT_ID
+REACT_APP_FIREBASE_STORAGE_BUCKET
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID
+REACT_APP_FIREBASE_APP_ID
+REACT_APP_FIREBASE_MEASUREMENT_ID
+```
 
-### Code Splitting
+Start the server
+```bash
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Deployment Instructions
 
-### Analyzing the Bundle Size
+### Vercel Deployment
+- Create an account on vercel
+- Import your GitHub repository
+- Choose your branch (usually main)
+- Deploy
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Contributors 
+[Mahika Garg](https://github.com/Mahikagarg09)
