@@ -39,7 +39,7 @@ export default function Login() {
     
             // Store Google photo in Firebase Storage
             const date = new Date().getTime();
-            const storageRef = ref(storage, `${displayName}_${date}`);
+            const storageRef = ref(storage, `user-profiles/${user.uid}`)
             await uploadBytesResumable(storageRef, await fetch(photoURL).then(res => res.blob()));
     
             // Create Firestore document for the user
@@ -48,6 +48,7 @@ export default function Login() {
                 name: displayName,
                 email: user.email,
                 photoURL: storageRef.fullPath, // Store the path in Storage
+                name_in_lowercase:displayName.toLowerCase(),
             });
     
             // Create empty user chats on Firestore
