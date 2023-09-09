@@ -216,7 +216,7 @@ export default function Leftside({ toggleSidebar }) {
                                             <div className="sm:flex text-center sm:justify-between mb-2 p-5 pt-2">
                                                 <div className="flex justify-center">
                                                     {selectedImage || currentUser.photoURL || emptyprofile ? (
-                                                        <img src={selectedImage || currentUser.photoURL || emptyprofile} alt="Avatar" className="bg-cover w-28 h-28 rounded-full" />
+                                                        <img src={selectedImage ? URL.createObjectURL(selectedImage) : currentUser.photoURL || emptyprofile} alt="Avatar" className="bg-cover w-28 h-28 rounded-full" />
                                                     ) : (
                                                         <img src={currentUser.photoURL || emptyprofile} alt="Avatar" className="w-28 bg-cover" />
                                                     )}
