@@ -24,6 +24,7 @@ export default function Login() {
         }
     };
 
+ 
     const handleGoogleSignIn = async () => {
         try {
             const result = await signInWithPopup(auth, provider);
@@ -39,24 +40,38 @@ export default function Login() {
     
             // Store Google photo in Firebase Storage
             const date = new Date().getTime();
-            const storageRef = ref(storage, `user-profiles/${user.uid}`)
-            await uploadBytesResumable(storageRef, await fetch(photoURL).then(res => res.blob()));
+            const storageRef = ref(storage, `user-profiles/${user.uid}`);
+    
+            // Upload the image with error handling
+            try {
+                const photoBlob = await fetch(photoURL).then((res) => res.blob());
+                await uploadBytesResumable(storageRef, photoBlob);
+            } catch (storageError) {
+                console.error('Error uploading photo to Firebase Storage:', storageError);
+                // Handle the storage error, possibly by setting an error state
+                return;
+            }
     
             // Create Firestore document for the user
-            await setDoc(doc(db, "users", user.uid), {
+            const userDocRef = doc(db, "users", user.uid);
+            await setDoc(userDocRef, {
                 uid: user.uid,
                 name: displayName,
                 email: user.email,
                 photoURL: storageRef.fullPath, // Store the path in Storage
-                name_in_lowercase:displayName.toLowerCase(),
+                name_in_lowercase: displayName.toLowerCase(),
             });
     
             // Create empty user chats on Firestore
-            await setDoc(doc(db, "userchats", user.uid), {});
+            const userChatsDocRef = doc(db, "userchats", user.uid);
+            await setDoc(userChatsDocRef, {});
     
+            // Redirect or navigate to the desired route
             navigate("/");
         } catch (err) {
+            console.error('Error during Google sign-in:', err);
             setErr(true);
+            // Handle the error, possibly by displaying an error message to the user
         }
     };
     
@@ -120,6 +135,7 @@ export default function Login() {
                             >
                                 Sign in
                             </button>
+                            </form>
                             {err && <span>Something went wrong</span>}
                             {/* <!-- Divider --> */}
                             <div
@@ -147,7 +163,6 @@ export default function Login() {
                                     Sign up
                                 </Link>
                             </p>
-                        </form>
                     </div>
                 </div>
             </div>
