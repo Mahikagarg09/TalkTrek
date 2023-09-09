@@ -3,14 +3,28 @@ import emptyProfile from "../assets/emptyprofile.jpg"
 import { ChatContext } from '../Context/ChatContext';
 import { db } from '../firebase';
 import { doc, updateDoc } from 'firebase/firestore';
+import { AuthContext } from '../Context/AuthContext';
 
 export default function ChatHeader({ toggleSidebar }) {
     const { data } = useContext(ChatContext);
+    const {currentUser} = useContext(AuthContext);
 
     const handledelete = async () => {
         await updateDoc(doc(db, "chats", data.chatId), {
             messages: [],
         });
+
+        await updateDoc(doc(db, "userchats", currentUser.uid), {
+            [data.chatId + ".lastMessage.text"]: "",
+            [data.chatId + ".date"]: null,
+
+        })
+
+        await updateDoc(doc(db, "userchats", data.user.uid), {
+            [data.chatId + ".lastMessage.text"]: "",
+            [data.chatId + ".date"]: null,
+
+        })
     }
 
     return (
