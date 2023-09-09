@@ -120,7 +120,7 @@ export default function MessageSend() {
                 {imgPreview ? (
                     <img
                         src={imgPreview}
-                        alt="Selected Image"
+                        alt="Selected-img"
                         className="h-8 w-8 rounded-full object-cover"
                     />
                 ) : (

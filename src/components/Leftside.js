@@ -5,7 +5,7 @@ import SearchUser from './SearchUser'
 import { signOut, updateProfile } from 'firebase/auth'
 import { auth } from '../firebase'
 import { AuthContext } from '../Context/AuthContext';
-import { collection, query, where, getDocs, getDoc, setDoc, updateDoc, serverTimestamp, doc } from "firebase/firestore";
+import { collection, query, where, getDocs, setDoc, updateDoc, serverTimestamp, doc } from "firebase/firestore";
 import { db, storage } from "../firebase"
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
@@ -95,7 +95,7 @@ export default function Leftside({ toggleSidebar }) {
                     if (userData.hasOwnProperty(key)) {
                         const nestedData = userData[key];
                         // Check if the nested object contains userInfo and displayName
-                        if (nestedData.userInfo && nestedData.userInfo.displayName == currentUser.displayName) {
+                        if (nestedData.userInfo && nestedData.userInfo.displayName === currentUser.displayName) {
                             // Update the displayName
                             nestedData.userInfo.displayName = newDisplayName;
                             // Update the document in Firebase with the modified data
@@ -143,7 +143,7 @@ export default function Leftside({ toggleSidebar }) {
                         if (userData.hasOwnProperty(key)) {
                             const nestedData = userData[key];
                             // Check if the nested object contains userInfo and displayName
-                            if (nestedData.userInfo.displayName == currentUser.displayName && (nestedData.userInfo.photoURL == null || nestedData.userInfo.photoURL == currentUser.photoURL)) {
+                            if (nestedData.userInfo.displayName === currentUser.displayName && (nestedData.userInfo.photoURL === null || nestedData.userInfo.photoURL === currentUser.photoURL)) {
                                 // Update
                                 nestedData.userInfo.photoURL = downloadURL;
                                 // Update the document in Firebase with the modified data

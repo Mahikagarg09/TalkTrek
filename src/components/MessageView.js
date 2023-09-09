@@ -66,7 +66,6 @@ export default function MessageView({toggleSidebar}) {
                                     {chat[1].userInfo.displayName}
                                 </p>
                                 <p className="text-green text-sm">
-                                    {/* {chat[1].lastMessage?.text} */}
                                     {chat[1].lastMessage?.text.slice(0, 45)}
                                     {chat[1].lastMessage?.text.length > 45 ? "..." : ""}
                                 </p>

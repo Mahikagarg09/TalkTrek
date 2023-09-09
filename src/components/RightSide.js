@@ -16,7 +16,7 @@ const RightSide = ({ toggleSidebar,sidebarVisible }) => {
                     "url(https://e1.pxfuel.com/desktop-wallpaper/508/744/desktop-wallpaper-chat-warm-grey-iphone-chat-whatsapp-iphone.jpg)",
             }}
         >
-            {data.chatId != "null" ? (
+            {data.chatId !== "null" ? (
                 <>
                     <ChatHeader toggleSidebar={toggleSidebar} sidebarVisible={sidebarVisible}/>
                     <div className="flex flex-col px-5 py-4 ">

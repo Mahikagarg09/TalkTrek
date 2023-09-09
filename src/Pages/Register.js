@@ -27,9 +27,7 @@ export default function Register() {
 
         try {
             const res = await createUserWithEmailAndPassword(auth, email, password);
-            console.log(res);
 
-            // const date = new Date().getTime();
             let downloadURL = null; // Initialize downloadURL to null
 
             if (file) {
