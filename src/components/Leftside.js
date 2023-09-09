@@ -100,7 +100,6 @@ export default function Leftside({ toggleSidebar }) {
                             nestedData.userInfo.displayName = newDisplayName;
                             // Update the document in Firebase with the modified data
                             await setDoc(doc.ref, userData);
-                            console.log("Display name updated successfully!");
                         }
                     }
                 }
@@ -116,7 +115,6 @@ export default function Leftside({ toggleSidebar }) {
             });
 
             setNewDisplayName("");
-            console.log(currentUser);
         } catch (error) {
             console.error("Error updating display name:", error);
         }
@@ -125,7 +123,6 @@ export default function Leftside({ toggleSidebar }) {
     const uploadImage = async () => {
         try {
             if (selectedImage) {
-                console.log("selected img", selectedImage)
                 setUploading(true);
                 // Upload the selected image to a storage location (e.g., Firebase Storage).
                 const storageRef = ref(storage, `user-profiles/${currentUser.uid}`);
@@ -148,7 +145,6 @@ export default function Leftside({ toggleSidebar }) {
                                 nestedData.userInfo.photoURL = downloadURL;
                                 // Update the document in Firebase with the modified data
                                 await setDoc(doc.ref, userData);
-                                console.log("Profile pic  updated successfully!");
                             }
                         }
                     }
@@ -167,7 +163,6 @@ export default function Leftside({ toggleSidebar }) {
 
                 // Clear the selected image state and update UI.
                 setSelectedImage(null);
-                console.log("Profile picture updated successfully!");
             }
         } catch (error) {
             console.error("Error uploading profile picture:", error);

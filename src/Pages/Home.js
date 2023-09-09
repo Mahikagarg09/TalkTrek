@@ -8,6 +8,7 @@ export default function Home() {
 
   const toggleSidebar = () => {
     setSidebarVisible(!sidebarVisible);
+  
   };
 
   useEffect(() => {
