@@ -31,7 +31,7 @@ export default function Leftside({ toggleSidebar }) {
             return;
         }
 
-        const currentUserId = currentUser.uid; // Assuming you have currentUser defined
+        const currentUserId = currentUser.uid;
 
         // Query to filter by 'name_in_lowercase' field
         const nameQuery = query(
@@ -77,91 +77,6 @@ export default function Leftside({ toggleSidebar }) {
             console.log(err);
         }
     }
-    //--------------------------------IF ANY USER IS SELECTED TO CHAT----------------
-
-    const handleSelect = async () => {
-        //check wether the group(chats in firestore) exists, if not create 
-        const combinedId =
-            currentUser.uid > user.uid
-                ? currentUser.uid + user.uid
-                : user.uid + currentUser.uid;
-        try {
-            //if the chat between the user is exist 
-            //we store in the response constant
-            const res = await getDoc(doc(db, "chats", combinedId));
-            /*If the Response that is chat between the user is not exsit we create the Chats  */
-            if (!res.exists()) {
-
-                await setDoc(doc(db, "chats", combinedId), { messages: [] });
-                //create user Chats
-
-                /* while Creating user Chats in search bar what we need is 
-                   *both userID(id)
-                   *last message {we want to show at bottom of every user}
-                   *displayName (dn)
-                   *img 
-                   *date {we are going to sort the date in this file }
-                */
-
-                /*   usersChat:{
-                      joyeId :{              
-                        combinedId :{
-                              userInfo{
-                                 dn,img,id 
-                              },
-                              lastMessage:""       //rightnow we dont have any chat 
-                              date:               //it is current date
-                        }
-                      }
-                   } */
-
-                await updateDoc(doc(db, "userchats", currentUser.uid), {
-                    [combinedId + ".userInfo"]: {
-
-                        uid: user.uid,
-                        displayName: user.name,
-                        photoURL: user.photoURL,
-                        lowercase: user.name.toLowerCase(),
-
-                    },
-
-                    [combinedId + ".date"]: serverTimestamp(),   //serverTimeStamp is  function of firebase it calculated time according  to different time zone 
-
-                    /* RightNow we are not intialising the bottom msg of the user
-                       Because right now we dont have any current user 
-    
-                       we are updating it when we Send msg to friend
-                    */
-                });
-
-                /* We are doing same thing for the other side of  user  */
-
-                await updateDoc(doc(db, "userchats", user.uid), {
-                    [combinedId + ".userInfo"]: {
-
-                        uid: currentUser.uid,
-                        displayName: currentUser.displayName,
-                        photoURL: currentUser.photoURL,
-                        lowercase: currentUser.displayName.toLowerCase(),
-
-                    },
-
-                    [combinedId + ".date"]: serverTimestamp(),   //serverTimeStamp is  function of firebase it calculated time according  to different time zone 
-
-                    /* RightNow we are not intialising the bottom msg of the user
-                       Because right now we dont have any current user 
-       
-                       we are updating it when we Send msg to friend
-                    */
-
-                });
-            }
-        }
-        catch (err) { }
-
-        setUser(null);
-        setsearchValue("");
-    };
 
     // -----------------------------PROFILE CLICK-----------------------------------
     const handleProfileClick = () => {
@@ -247,6 +162,7 @@ export default function Leftside({ toggleSidebar }) {
                     photoURL: downloadURL,
                     lastUpdated: serverTimestamp(),
                 });
+                setSelectedImage(null);
                 setUploading(false);
 
                 // Clear the selected image state and update UI.
@@ -314,7 +230,7 @@ export default function Leftside({ toggleSidebar }) {
                                                         <button className="items-center text-base font-medium rounded-xl bg-violet-50 px-4 "
                                                             onClick={uploadImage}
                                                         >
-                                                            Upload
+                                                            Upload Now
                                                         </button>
                                                     ) : (
                                                         <label className="items-center text-base font-medium rounded-xl bg-violet-50 px-4 cursor-pointer">
@@ -410,14 +326,15 @@ export default function Leftside({ toggleSidebar }) {
                     />
                 </div>
                 {err && <span>User not found</span>}
-                {user &&
-                    <div className='hover:bg-gray-200' onClick={handleSelect}>
+                {user && user.map((u) => (
+                    <div className='hover:bg-gray-200'  key={u.uid}>
                         <div className="overflow-auto scrollbar-none mt-2">
-                            <SearchUser user={user} />
+                            <SearchUser user={u} setsearchValue={setsearchValue} setUser={setUser}/>
                         </div>
                         <div className="my-4 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-neutral-300 after:mt-0.5 after:flex-1 after:border-t after:border-neutral-300"></div>
                     </div>
-                }
+                ))}
+
                 <div className="overflow-auto scrollbar-none mt-2">
                     <MessageView toggleSidebar={toggleSidebar} />
                 </div>
