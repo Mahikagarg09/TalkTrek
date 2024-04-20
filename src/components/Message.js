@@ -80,7 +80,7 @@ export default function Message() {
                     className="bg-white cursor-pointer  shadow-md px-4 py-3 rounded-r-2xl  flex items-center justify-center"
                 >
                     <div className="flex flex-col items-center justify-center">
-                        <p className="  flex justify-between items-end max-w-[410px] p-1 text-xl">{m.text}</p>
+                        <p className="  flex justify-between items-end max-w-[410px] p-1 text-l">{m.text}</p>
                         {m.img && (
                             <div className="w-100 p-2">
                                 <img
