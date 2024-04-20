@@ -20,6 +20,8 @@ This project aims to create a dynamic chat website.
 ### Register and Login Process
 The application provides a secure way of user authentication.
 User can create account with his basic detail or  signin using google/email.
+![image](https://github.com/Mahikagarg09/TalkTrek/assets/98404416/7f9f0596-ccc7-47c4-8d35-0399b03eb47f)
+
 
 ### Chat Page
 The left side of the page provides features such as-
@@ -27,6 +29,8 @@ The left side of the page provides features such as-
 -Search a friend to chat with who as an account on TalkTrek
 -Select a friend to chat with using text, images and emojis.
 -Delete chat with a person.
+![image](https://github.com/Mahikagarg09/TalkTrek/assets/98404416/ff8b5c05-0264-487c-8a98-c888a89baa76)
+![image](https://github.com/Mahikagarg09/TalkTrek/assets/98404416/ad498370-b7df-4375-9706-523bf956cb66)
 
 ## Backend Development
 
